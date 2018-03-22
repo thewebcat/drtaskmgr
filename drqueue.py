@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
-
+#!/usr/bin/env python3
+import redis
 from queue import Queue
 from threading import Thread
 
-import time
 
-num_worker_threads = 2
+WORKER_THREADS = 2
 
+r = redis.StrictRedis(host='localhost', port=6379, db=0)
 q = Queue()
 
 
@@ -26,23 +26,21 @@ def worker():
             q.task_done()
 
 
-def source():
-    for i in range(100, 103):
-        yield i
-
-
 def main():
     print("Starting Dr.Web Task Manager...")
 
-    for i in range(num_worker_threads):
+    for i in range(WORKER_THREADS):
         t = Thread(target=worker, name='worker-{}'.format(i))
         t.daemon = True
         t.start()
         print('Worker {} started'.format(i))
 
-    for item in source():
-        time.sleep(2)
-        q.put(item)
+    pubsub = r.pubsub()
+    pubsub.subscribe(['drtaskmgr'])
+
+    for item in pubsub.listen():
+        if not item['data'] == 1:
+            q.put(item['data'])
 
     q.join()
 
