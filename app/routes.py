@@ -1,18 +1,13 @@
-import datetime
-import redis
-from flask import jsonify
+from flask import jsonify, redirect, url_for
 
 from app import app, db
 from app.models import Task
+from rq import RedisQueue
 
 
 @app.route('/')
-@app.route('/index')
 def home():
-    return 'Restricted access'
-
-
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
+    return redirect(url_for('get_tasks'))
 
 
 @app.route('/api/v1.0/tasks', methods=['GET'])
@@ -59,5 +54,7 @@ def add_task():
     task = Task()
     db.session.add(task)
     db.session.commit()
-    r.publish('drtaskmgr', task.id)
+    # r.publish('drtaskmgr', task.id)
+    q = RedisQueue('drwebtaskmgr')
+    q.put(task.id)
     return jsonify({'task': task.id})
