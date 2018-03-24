@@ -21,7 +21,6 @@ Add task in queue:
     post: /api/v1.0/tasks
 
 ```
-Output:
 {
     "task": 33
 }
