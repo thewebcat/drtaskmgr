@@ -54,7 +54,6 @@ def add_task():
     task = Task()
     db.session.add(task)
     db.session.commit()
-    # r.publish('drtaskmgr', task.id)
     q = RedisQueue('drwebtaskmgr')
     q.put(task.id)
     return jsonify({'task': task.id})
