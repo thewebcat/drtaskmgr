@@ -4,12 +4,14 @@ drtaskmgr
 Usage
 -----
 
-install all requirements:
+Install `redis-server`
+
+Install all requirements:
 
     pip install -r requirements.txt
 
 
-launch rqmanager:
+Launch rqmanager:
 
     ./rqmanager.py
 
